@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, UserPlus, Loader2, Check } from "lucide-react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { isAddress } from "viem";
@@ -22,23 +22,19 @@ export function AuthorizeHeirModal({ isOpen, onClose, credentialIndex, credentia
 
   const isLoading = isPending || isConfirming;
 
-  // Reset state
-  useEffect(() => {
-    if (!isOpen) {
-      setAddress("");
-      setError(null);
-      reset();
-    }
-  }, [isOpen, reset]);
+  const handleClose = useCallback(() => {
+    setAddress("");
+    setError(null);
+    reset();
+    onClose();
+  }, [onClose, reset]);
 
-  // Close after success
   useEffect(() => {
     if (isSuccess) {
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      const timer = setTimeout(handleClose, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [isSuccess, onClose]);
+  }, [isSuccess, handleClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +67,7 @@ export function AuthorizeHeirModal({ isOpen, onClose, credentialIndex, credentia
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleClose} />
       
       {/* Modal */}
       <div className="relative w-full max-w-md mx-4 bg-zinc-950 border border-zinc-800">
@@ -87,7 +83,7 @@ export function AuthorizeHeirModal({ isOpen, onClose, credentialIndex, credentia
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 text-zinc-500 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />

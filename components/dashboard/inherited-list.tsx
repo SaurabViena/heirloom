@@ -104,7 +104,6 @@ function InheritedOwnerCard({ owner, authorizations, onViewCredential }: Inherit
 
   const hasAllAccess = authorizations.some((a) => a.authType === 2);
   const singleAuths = authorizations.filter((a) => a.authType === 1);
-  const count = credentialCount ? Number(credentialCount) : 0;
   const names = (credentialNames as string[]) || [];
 
   const shortAddress = `${owner.slice(0, 6)}...${owner.slice(-4)}`;

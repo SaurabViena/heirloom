@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X, Users, Loader2, Check } from "lucide-react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { isAddress } from "viem";
@@ -20,21 +20,19 @@ export function AuthorizeAllModal({ isOpen, onClose }: AuthorizeAllModalProps) {
 
   const isLoading = isPending || isConfirming;
 
-  useEffect(() => {
-    if (!isOpen) {
-      setAddress("");
-      setError(null);
-      reset();
-    }
-  }, [isOpen, reset]);
+  const handleClose = useCallback(() => {
+    setAddress("");
+    setError(null);
+    reset();
+    onClose();
+  }, [onClose, reset]);
 
   useEffect(() => {
     if (isSuccess) {
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+      const timer = setTimeout(handleClose, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [isSuccess, onClose]);
+  }, [isSuccess, handleClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +64,7 @@ export function AuthorizeAllModal({ isOpen, onClose }: AuthorizeAllModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleClose} />
       
       <div className="relative w-full max-w-md mx-4 bg-zinc-950 border border-zinc-800">
         <div className="flex items-center justify-between p-6 border-b border-zinc-800">
@@ -79,7 +77,7 @@ export function AuthorizeAllModal({ isOpen, onClose }: AuthorizeAllModalProps) {
               <p className="text-xs text-zinc-500">Grant access to all your credentials</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white transition-colors">
+          <button onClick={handleClose} className="p-2 text-zinc-500 hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>

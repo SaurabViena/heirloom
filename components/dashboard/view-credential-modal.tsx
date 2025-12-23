@@ -43,16 +43,6 @@ export function ViewCredentialModal({ isOpen, onClose, credentialIndex, credenti
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Reset state
-  useEffect(() => {
-    if (!isOpen) {
-      setDecryptedData({ account: null, password: null, extra: null });
-      setShowPassword(false);
-      setError(null);
-      setDecryptStep("");
-    }
-  }, [isOpen]);
-
   // Decrypt multiple handles with userDecrypt
   const userDecryptHandles = async (handleList: string[]): Promise<Record<string, bigint>> => {
     if (!instance || !walletClient || !address) throw new Error("Not ready");
@@ -191,11 +181,6 @@ export function ViewCredentialModal({ isOpen, onClose, credentialIndex, credenti
     await navigator.clipboard.writeText(text);
     setCopied(field);
     setTimeout(() => setCopied(null), 2000);
-  };
-
-  // Format date
-  const formatDate = (timestamp: bigint) => {
-    return new Date(Number(timestamp) * 1000).toLocaleString();
   };
 
   if (!isOpen) return null;

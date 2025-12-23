@@ -1,19 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { ConnectKitButton } from "connectkit";
 import { useAccount, useBalance } from "wagmi";
 import { useFhe } from "@/components/providers/fhe-provider";
 
+const emptySubscribe = () => () => {};
+
 export function ConnectButton() {
-  const [mounted, setMounted] = useState(false);
-  const { address, isConnected } = useAccount();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const { address } = useAccount();
   const { data: balance } = useBalance({ address });
   const { loading: fheLoading, instance: fheInstance, error: fheError } = useFhe();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) {
     return <div className="h-10 w-32 bg-zinc-800 rounded-lg animate-pulse" />;
